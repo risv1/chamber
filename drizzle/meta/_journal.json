@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1710515950384,
+      "tag": "0000_oval_mojo",
+      "breakpoints": true
+    }
+  ]
+}

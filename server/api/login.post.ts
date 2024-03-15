@@ -1,7 +1,17 @@
 import { z } from "zod"
-import { supabase } from "~/supabase.config"
 import bcrypt from "bcrypt"
-import { User } from "~/models/user"
+import { db } from "~/utils/db"
+import { users } from "~/schema"
+import { eq } from "drizzle-orm"
+import jwt from "jsonwebtoken"
+
+type User = {
+    id: string,
+    name: string,
+    email: string,
+    password: string,
+    created_at: string
+}
 
 const schema = z.object({
     email: z.string().email(),
@@ -16,33 +26,24 @@ export default defineEventHandler(async(event)=>{
             password: body.password
         })
 
-        const {data, error} = await supabase
-            .from('users')
-            .select()
-            .filter('email', 'eq', givenData.email)
-            .single()
-
-        if (error) {
-            throw error
-        }
-        if (!data) {
-            throw new Error('User not found')
-        }
-
-        const user = data as User
-        const passwordMatch = await bcrypt.compare(givenData.password, user.password)
-        if (!passwordMatch) {
-            throw new Error('Invalid password')
-        }
-
-        console.log(user)
-
-        return {
-            status: 200,
-            body: {
-                email: user.email,
-                name: user.name,
+        const [user] = await db.select().from(users).where(eq(body.email, users.email))
+        if(!user){
+            return{
+                statusCode: 404,
+                message: "User not found"
             }
+        }
+        const passwordMatch = await bcrypt.compare(body.password, user.password)
+        if (!passwordMatch) {
+            return {
+              statusCode: 401,
+              message: "Password does not match",
+            };
+          }
+        
+        return{
+            statusCode: 200,
+            message: "Login successful"
         }
 
     } catch(e){
