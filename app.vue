@@ -7,14 +7,16 @@
 <script setup lang="ts">
 import { useAuthStore } from "./store/auth";
 
-watchEffect(() => {
-  async function fetching() {
-    const { fetchUser, user } = useAuthStore();
+const { fetchUser, user } = useAuthStore();
 
+onMounted(() => {
+  async function fetching() {
     await fetchUser();
 
-    console.log(user);
+    if (user) {
+      console.log("User session:", user);
+    }
   }
-  fetching()
+  fetching();
 });
 </script>

@@ -52,20 +52,14 @@ const onSubmit = async (event: Event) => {
         statusCode: res.status,
       });
     }
+
     const response = await res.json();
-    console.log(response);
-
     if (response) {
-      console.log("User might be: ", response.user);
-      setUser(response.user);
-      console.log("User is: ", user);
-      if (user) {
-      navigateTo("/chat");
+      setUser(response.user)
+      navigateTo("/chat")
     }
-    }
-
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 </script>

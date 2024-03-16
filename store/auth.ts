@@ -12,10 +12,14 @@ export const useAuthStore = defineStore({
   }),
   actions: {
     async fetchUser(){
-        const { user }: any = await useFetch("http://localhost:3000/api/session")
-        if(user){
-            this.user = user
-        }
+        const res = await fetch("http://localhost:3000/api/session", {
+            method: "GET",
+            credentials: "include",
+            headers: {"Content-Type": "application/json"}
+        })
+          const data = await res.json()
+          this.user = data.userData
+          console.log("User set: ", this.user)
     },
     async setUser(user: {email: string, name: string}){
         this.user = user
