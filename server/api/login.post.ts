@@ -5,14 +5,6 @@ import { users } from "~/schema"
 import { eq } from "drizzle-orm"
 import jwt from "jsonwebtoken"
 
-type User = {
-    id: string,
-    name: string,
-    email: string,
-    password: string,
-    created_at: string
-}
-
 const schema = z.object({
     email: z.string().email(),
     password: z.string().min(8),
@@ -26,7 +18,7 @@ export default defineEventHandler(async(event)=>{
             password: body.password
         })
 
-        const [user] = await db.select().from(users).where(eq(body.email, users.email))
+        const [user] = await db.select().from(users).where(eq(users.email, givenData.email))
         if(!user){
             return{
                 statusCode: 404,
@@ -40,10 +32,18 @@ export default defineEventHandler(async(event)=>{
               message: "Password does not match",
             };
           }
+
+        const token = jwt.sign(user, "secret", {expiresIn: "24h"})
         
+        setCookie(event, "token", token, {httpOnly: true, sameSite: true})
+
         return{
             statusCode: 200,
-            message: "Login successful"
+            message: "Login successful",
+            user: {
+                email: user.email,
+                name: user.name
+            }
         }
 
     } catch(e){

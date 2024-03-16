@@ -25,34 +25,47 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from "~/store/auth";
 
-    const email = ref('')
-    const password = ref('')
+const { setUser, user } = useAuthStore();
 
-    const onSubmit = async(event: Event) => {
-        try{
-            event.preventDefault()
-            const res = await fetch("http://localhost:3000/api/login", {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email: email.value,
-                    password: password.value
-                })
-            })
-            if(!res.ok){
-                throw createError({
-                    message: "An error occurred",
-                    statusCode: res.status
-                })
-            }
-            console.log("Login successful")
-            navigateTo('/chat')
-        }catch(err){
-            console.log(err)
-        }
+const email = ref("");
+const password = ref("");
+
+const onSubmit = async (event: Event) => {
+  try {
+    event.preventDefault();
+    const res = await fetch("http://localhost:3000/api/login", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email.value,
+        password: password.value,
+      }),
+    });
+    if (!res.ok) {
+      throw createError({
+        message: "An error occurred",
+        statusCode: res.status,
+      });
     }
+    const response = await res.json();
+    console.log(response);
+
+    if (response) {
+      console.log("User might be: ", response.user);
+      setUser(response.user);
+      console.log("User is: ", user);
+      if (user) {
+      navigateTo("/chat");
+    }
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+};
 </script>
