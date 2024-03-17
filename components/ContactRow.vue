@@ -19,7 +19,7 @@
             Name: <span class="pl-5 text-violet-700">{{ item.name }}</span>
           </p>
           <button
-            @click="navigateTo(`${route}/${item.id}`)"
+            @click="navigateTo(`${route}/${item.id}?username=${user?.name}&room=${item.name.toLowerCase()}`)"
             class="p-3 bg-violet-500 text-white text-xl rounded-xl"
           >
             Open
@@ -32,6 +32,7 @@
 
 <script setup lang="ts">
 defineProps({
+  user: Object,
   items: Array<{ id: number; name: String}>,
   route: String
 });

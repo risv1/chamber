@@ -1,5 +1,5 @@
 import type { H3Event } from "h3";
-import initSocket from "~utils/socket";
+import { initSocket } from "~/utils/socket";
 
 const router = createRouter()
 
