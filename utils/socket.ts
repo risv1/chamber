@@ -1,7 +1,7 @@
 import { Server, type Socket, type ServerOptions } from "socket.io";
 import moment from "moment";
 import type { H3Event } from "h3";
-import { userJoin, type User, userLeave, getRoomUsers } from "./users";
+import { userJoin, type User, userLeave, getRoomUsers, getCurrentUser } from "./users";
 
 const options: Partial<ServerOptions> = {
   path: "/api/socket",
@@ -26,6 +26,18 @@ export const initSocket = (event: H3Event) => {
           text: `${user.username} has joined the chat`,
           time: moment().format("h:mm a"),
         });
+      })
+
+      socket.on("sendMessage", (payload: { text: string }) => {
+        const user = getCurrentUser(socket.id);
+        console.log("user", user);
+        if(user){
+          io.to(user.room).emit("message", {
+            username: user.username,
+            text: payload.text,
+            time: moment().format("h:mm a"),
+          });
+        }
       })
 
       socket.on("disconnect", ()=>{
